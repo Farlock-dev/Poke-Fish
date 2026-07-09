@@ -639,20 +639,30 @@
             setTimeout(() => { overlay.classList.remove('show'); sprite.style.display = emoji.style.display = 'none'; }, success ? 3000 : 2000);
         }
 
-        function startPowerMeter() {
-            if (gameState !== GameState.IDLE || fishingCooldown || !isLoggedIn) return;
-            const rod = getEquippedRod();
-            if (!rod) { showMessage('🎣 Você precisa de uma vara! Compre na loja.', 2500); return; }
-            if (playerData.currentEnergy <= 0) { showMessage('⚡ Sem energia!', 2500); return; }
-            if (!useEnergy(1)) { showMessage('⚡ Sem energia!', 2500); return; }
-            gameState = GameState.POWER_METER;
-            powerMeterValue = 0;
-            powerMeterDirection = 1;
-            powerMeterContainer.style.display = 'block';
-            castButton.textContent = '🎯 PARAR!';
-            castButton.style.background = '#ff8844';
-            powerMeterFill.style.width = '0%';
-            document.getElementById('pokemon-overlay').classList.remove('show');
+        async function startPowerMeter() {
+  if (gameState !== GameState.IDLE || fishingCooldown || !isLoggedIn) return;
+  const rod = getEquippedRod();
+  if (!rod) { showMessage('🎣 Você precisa de uma vara! Compre na loja.', 2500); return; }
+  if (playerData.currentEnergy <= 0) { showMessage('⚡ Sem energia!', 2500); return; }
+
+  // Gasta energia no servidor antes de começar
+  try {
+    const data = await apiFetch('/user/spend-energy', { method: 'POST' });
+    playerData.currentEnergy = data.currentEnergy;
+    updateUI();
+
+    // Inicia o medidor de força
+    gameState = GameState.POWER_METER;
+    powerMeterValue = 0;
+    powerMeterDirection = 1;
+    powerMeterContainer.style.display = 'block';
+    castButton.textContent = '🎯 PARAR!';
+    castButton.style.background = '#ff8844';
+    powerMeterFill.style.width = '0%';
+    document.getElementById('pokemon-overlay').classList.remove('show');
+  } catch (e) {
+    showMessage('⚡ ' + (e.message || 'Erro ao gastar energia'), 2000);
+  }
         }
 
         function stopPowerMeter() {
