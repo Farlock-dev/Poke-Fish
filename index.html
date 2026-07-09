@@ -477,7 +477,11 @@
 
         async function buyRod(rodId) {
             const data = await apiFetch('/user/buy-rod', { method: 'POST', body: JSON.stringify({ rodId }) });
-            playerData.coins = data.coins; playerData.ownedRods = data.ownedRods; playerData.equippedRod = data.equippedRod;
+            playerData.coins = data.coins;
+            playerData.ownedRods = data.ownedRods;
+            playerData.equippedRod = data.equippedRod;
+            if (data.currentEnergy !== undefined) playerData.currentEnergy = data.currentEnergy;
+            if (data.maxEnergy !== undefined) playerData.maxEnergy = data.maxEnergy;
             return data;
         }
 
@@ -1576,4 +1580,4 @@
         console.log('🎣 Poke Fish NFT - Completo e funcional!');
     </script>
 </body>
-</html>
+    </html>
