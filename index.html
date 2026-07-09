@@ -43,9 +43,8 @@
         #auth-msg.success { color: #51cf66; }
 
         #hud { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-        #top-bar { position: absolute; top: 15px; left: 15px; right: 15px; pointer-events: auto; display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-        .stats-group { display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap; justify-content: flex-start; flex: 1 1 auto; }
-        .actions-group { display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap; justify-content: flex-end; flex: 0 1 auto; }
+        #top-bar { position: absolute; top: 15px; left: 15px; right: 15px; pointer-events: auto; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 10px; flex-wrap: wrap; }
+
         .stat-box { background: rgba(0,0,0,0.75); border: 2px solid var(--gold); border-radius: 12px; padding: 8px 14px; color: var(--gold); font-size: 10px; text-shadow: 2px 2px 0 #3A2E1C; text-align: center; min-width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(2px); box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 0 1 auto; }
         .stat-box .label { color: #ccc; font-size: 7px; margin-bottom: 4px; text-transform: uppercase; }
         .stat-box .value { font-size: 14px; color: #fff; }
@@ -137,14 +136,15 @@
         #referral-stats-list li span:last-child { color: #4CAF50; }
 
         @media (max-width: 700px) {
-            #top-bar { flex-direction: column; align-items: center; gap: 8px; }
-            .stats-group, .actions-group { width: 100%; justify-content: center; }
+            #top-bar { justify-content: center; gap: 6px; }
             .stat-box { padding: 6px 10px; font-size: 8px; min-width: 70px; } .stat-box .value { font-size: 12px; }
             #shop-panel, #coins-panel, #crypto-panel, #withdraw-panel { padding: 12px; max-height: 80vh; }
             .shop-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
             .shop-item { font-size: 8px; padding: 12px 8px; }
             #catch-meter-container { width: 92vw; height: 32px; }
             #catch-meter-indicator { width: 6px; }
+            #shop-button, #withdraw-btn, #referral-btn, #sound-toggle-btn, #logout-btn { min-width: 50px; min-height: 48px; padding: 6px 8px; }
+            #shop-button span, #withdraw-btn span, #referral-btn span, #sound-toggle-btn span, #logout-btn span { font-size: 7px; }
         }
     </style>
 </head>
@@ -201,32 +201,28 @@
 
     <div id="hud">
         <div id="top-bar">
-            <div class="stats-group">
-                <div class="stat-box">
-                    <div class="label">⚡ ENERGIA</div>
-                    <div class="value" id="energy-text">0/0</div>
-                    <div id="energy-bar-container"><div id="energy-bar-fill" style="width:0%"></div></div>
-                    <div class="energy-timer" id="energy-timer"></div>
-                </div>
-                <div class="stat-box">
-                    <div class="label">🎣 VARA</div>
-                    <div class="value" id="rod-name-display">Nenhuma</div>
-                </div>
-                <div class="stat-box">
-                    <div class="label">💰 MOEDAS</div>
-                    <div class="coins-row">
-                        <span class="value" id="coins-display">0</span>
-                        <button id="add-coins-btn">+</button>
-                    </div>
+            <div class="stat-box">
+                <div class="label">⚡ ENERGIA</div>
+                <div class="value" id="energy-text">0/0</div>
+                <div id="energy-bar-container"><div id="energy-bar-fill" style="width:0%"></div></div>
+                <div class="energy-timer" id="energy-timer"></div>
+            </div>
+            <div class="stat-box">
+                <div class="label">🎣 VARA</div>
+                <div class="value" id="rod-name-display">Nenhuma</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">💰 MOEDAS</div>
+                <div class="coins-row">
+                    <span class="value" id="coins-display">0</span>
+                    <button id="add-coins-btn">+</button>
                 </div>
             </div>
-            <div class="actions-group">
-                <button id="shop-button">🏪<span>Loja</span></button>
-                <button id="withdraw-btn">💸<span>Saque</span></button>
-                <button id="referral-btn">👥<span>Indicar</span></button>
-                <button id="sound-toggle-btn">🔊<span>Som</span></button>
-                <button id="logout-btn" style="display:none;">🚪<span>Sair</span></button>
-            </div>
+            <button id="shop-button">🏪<span>Loja</span></button>
+            <button id="withdraw-btn">💸<span>Saque</span></button>
+            <button id="referral-btn">👥<span>Indicar</span></button>
+            <button id="sound-toggle-btn">🔊<span>Som</span></button>
+            <button id="logout-btn" style="display:none;">🚪<span>Sair</span></button>
         </div>
 
         <div id="message"></div>
@@ -1522,4 +1518,4 @@
         console.log('🎣 Poke Fish NFT - Completo e funcional!');
     </script>
 </body>
-    </html>
+</html>
