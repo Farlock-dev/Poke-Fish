@@ -9,7 +9,7 @@
         :root { --bg: #87CEEB; --gold: #FFD966; --gold-dark: #3A2E1C; --border-color: #5C3E2C; }
         * { margin: 0; box-sizing: border-box; }
         body { margin: 0; overflow: hidden; font-family: 'Press Start 2P', cursive; background-color: var(--bg); user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; cursor: default; touch-action: manipulation; }
-        canvas { display: block; }
+        canvas { background-color: #87CEEB; display: block; }
 
         #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; pointer-events: all; transition: opacity 0.5s ease, visibility 0.5s ease; }
         #start-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -422,6 +422,7 @@
         // ========== AUTENTICAÇÃO E API ==========
         let isLoggedIn = false, currentUsername = '';
         let playerData = { coins: 0, ownedRods: [], equippedRod: null, currentEnergy: 0, maxEnergy: 0 };
+        let fishingToken = null; // token de pesca
 
         let authToken = null;
 
@@ -491,9 +492,13 @@
             return data;
         }
 
-        async function fishCatch(coinsEarned) {
-            const data = await apiFetch('/user/fish-catch', { method: 'POST', body: JSON.stringify({ coinsEarned }) });
+        async function fishCatch(coinsEarned, token) {
+            const data = await apiFetch('/user/fish-catch', {
+                method: 'POST',
+                body: JSON.stringify({ coinsEarned, fishingToken: token })
+            });
             playerData.coins = data.coins;
+            fishingToken = null; // limpa após uso
             return data;
         }
 
@@ -674,6 +679,7 @@
             try {
                 const data = await apiFetch('/user/spend-energy', { method: 'POST' });
                 playerData.currentEnergy = data.currentEnergy;
+                fishingToken = data.fishingToken; // armazena o token
                 updateUI();
 
                 if (gameState !== GameState.IDLE) return;
@@ -769,7 +775,7 @@
                 if (success) {
                     showMessage(`✅ ${chosen.name} capturado! (+${chosen.coins} moedas)`, 3000);
                     showPokemonOverlay(chosen, true);
-                    fishCatch(chosen.coins).then(() => updateUI());
+                    fishCatch(chosen.coins, fishingToken).then(() => updateUI());
                 } else {
                     showMessage(`❌ ${chosen.name} escapou...`, 2500);
                     showPokemonOverlay(chosen, false);
@@ -1580,4 +1586,4 @@
         console.log('🎣 Poke Fish NFT - Completo e funcional!');
     </script>
 </body>
-    </html>
+</html>
