@@ -210,18 +210,18 @@
     </div>
 
     <div id="event-modal">
-        <div id="event-panel">
-            <h2>☀️ Summer Event</h2>
-            <p style="font-size:12px; color:#FFD966;">11/07 - 11/08</p>
-            <img class="shiny-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/658.png" alt="Shiny Greninja">
-            <p style="font-size:14px; margin:10px 0;">⭐ Shiny Greninja 5⭐</p>
-            <div class="info">
-                <p>💰 <span class="highlight">1000 Moedas</span> = <span class="highlight">$10 USD</span></p>
-                <p class="chance">🎯 1% de chance em <span class="highlight">todas as varas</span></p>
-            </div>
-            <button onclick="closeEventModal()">🎣 Participar!</button>
+    <div id="event-panel">
+        <h2>☀️ Summer Event</h2>
+        <p style="font-size:12px; color:#FFD966;">11/07 - 11/08</p>
+        <img class="shiny-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/658.png" alt="Shiny Greninja">
+        <p style="font-size:14px; margin:10px 0;">⭐ Shiny Greninja 5⭐</p>
+        <div class="info">
+            <p>💰 <span class="highlight">1000 Moedas</span> = <span class="highlight">$10 USD</span></p>
+            <p class="chance">🎯 1% de chance em <span class="highlight">todas as varas</span></p>
         </div>
+        <button id="close-event-btn">🎣 Participar!</button>
     </div>
+</div>
 
     <canvas id="gameCanvas"></canvas>
 
@@ -1468,6 +1468,7 @@
         document.getElementById('copy-referral-btn').addEventListener('click', () => { navigator.clipboard.writeText(document.getElementById('referral-code-display').textContent).then(() => alert('Link copiado!')).catch(() => alert('Erro ao copiar')); });
         document.getElementById('logout-btn').addEventListener('click', () => { localStorage.removeItem('jwt_token'); window.location.reload(); });
         document.getElementById('telegram-btn').addEventListener('click', () => { window.open('https://t.me/pokefishnft', '_blank'); });
+        document.getElementById('close-event-btn').addEventListener('click', closeEventModal);
 
         // Saque
         document.getElementById('withdraw-btn').addEventListener('click', () => {
