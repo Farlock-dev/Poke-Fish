@@ -136,6 +136,18 @@
         #referral-stats-list li span:first-child { color: #FFD966; }
         #referral-stats-list li span:last-child { color: #4CAF50; }
 
+        #event-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 200; pointer-events: auto; backdrop-filter: blur(5px); }
+        #event-modal.show { display: flex; }
+        #event-panel { background: linear-gradient(145deg, #1a3a4a 0%, #0d1f2d 100%); border: 4px solid #FFD966; border-radius: 24px; padding: 30px; max-width: 450px; width: 90vw; text-align: center; box-shadow: 0 0 60px rgba(255,215,100,0.4), 0 0 80px rgba(0,150,255,0.2); font-family: 'Press Start 2P', cursive; color: #fff; }
+        #event-panel h2 { color: #FFD966; font-size: 18px; margin-bottom: 15px; text-shadow: 3px 3px 0 #1a3a4a; }
+        #event-panel .shiny-sprite { width: 120px; height: 120px; margin: 10px auto; display: block; filter: drop-shadow(0 0 20px rgba(100,180,255,0.8)); animation: float-sprite 2s ease-in-out infinite; }
+        #event-panel .info { font-size: 10px; line-height: 1.8; margin: 15px 0; color: #ddd; }
+        #event-panel .highlight { color: #FFD966; font-weight: bold; }
+        #event-panel .chance { color: #4ea8ff; font-size: 9px; margin: 10px 0; }
+        #event-panel button { background: linear-gradient(180deg, #FFD966 0%, #e6b800 100%); color: #3A2E1C; border: 3px solid #5C3E2C; border-radius: 12px; padding: 14px 30px; font-size: 14px; font-family: 'Press Start 2P', cursive; cursor: pointer; margin-top: 15px; width: 100%; box-shadow: 0 4px 0 #4a3a2a; transition: all 0.1s; }
+        #event-panel button:hover { background: #fff; transform: translateY(-2px); }
+        #event-panel button:active { transform: translateY(4px); box-shadow: 0 0px 0 #4a3a2a; }
+
         @media (max-width: 700px) {
             #top-bar { flex-direction: column; align-items: center; gap: 8px; }
             .stats-group, .actions-group { width: 100%; justify-content: center; }
@@ -194,6 +206,20 @@
             <h3 style="color:var(--gold); font-size:14px;">Meus Indicados</h3>
             <ul id="referral-stats-list"></ul>
             <button id="close-referral" class="secondary-btn" style="margin-top:15px;">Fechar</button>
+        </div>
+    </div>
+
+    <div id="event-modal">
+        <div id="event-panel">
+            <h2>☀️ Summer Event</h2>
+            <p style="font-size:12px; color:#FFD966;">11/07 - 11/08</p>
+            <img class="shiny-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/658.png" alt="Shiny Greninja">
+            <p style="font-size:14px; margin:10px 0;">⭐ Shiny Greninja 5⭐</p>
+            <div class="info">
+                <p>💰 <span class="highlight">1000 Moedas</span> = <span class="highlight">$10 USD</span></p>
+                <p class="chance">🎯 1% de chance em <span class="highlight">todas as varas</span></p>
+            </div>
+            <button onclick="closeEventModal()">🎣 Participar!</button>
         </div>
     </div>
 
@@ -311,7 +337,6 @@
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.128.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/" } }
     </script>
-
     <script type="module">
         // ========== URL DO BACKEND ==========
         const API_URL = 'https://pokefish-backend.onrender.com/api';
@@ -424,32 +449,24 @@
         let isLoggedIn = false, currentUsername = '';
         let playerData = { coins: 0, ownedRods: [], equippedRod: null, currentEnergy: 0, maxEnergy: 0 };
         let fishingToken = null;
+        let eventModalShown = false;
 
         let authToken = null;
 
         function getToken() {
             if (authToken) return authToken;
             const saved = localStorage.getItem('jwt_token');
-            if (saved) {
-                authToken = saved;
-                return saved;
-            }
+            if (saved) { authToken = saved; return saved; }
             return null;
         }
 
         function setToken(token, remember = false) {
             authToken = token;
-            if (remember) {
-                localStorage.setItem('jwt_token', token);
-            } else {
-                localStorage.removeItem('jwt_token');
-            }
+            if (remember) { localStorage.setItem('jwt_token', token); }
+            else { localStorage.removeItem('jwt_token'); }
         }
 
-        function removeToken() {
-            authToken = null;
-            localStorage.removeItem('jwt_token');
-        }
+        function removeToken() { authToken = null; localStorage.removeItem('jwt_token'); }
 
         async function apiFetch(endpoint, options = {}) {
             const token = getToken();
@@ -467,8 +484,7 @@
         }
 
         async function registerUser(username, password, referralCode = '') {
-            const data = await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ username, password, referralCode }) });
-            return data;
+            return await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ username, password, referralCode }) });
         }
 
         async function loadPlayerData() {
@@ -479,9 +495,7 @@
 
         async function buyRod(rodId) {
             const data = await apiFetch('/user/buy-rod', { method: 'POST', body: JSON.stringify({ rodId }) });
-            playerData.coins = data.coins;
-            playerData.ownedRods = data.ownedRods;
-            playerData.equippedRod = data.equippedRod;
+            playerData.coins = data.coins; playerData.ownedRods = data.ownedRods; playerData.equippedRod = data.equippedRod;
             if (data.currentEnergy !== undefined) playerData.currentEnergy = data.currentEnergy;
             if (data.maxEnergy !== undefined) playerData.maxEnergy = data.maxEnergy;
             return data;
@@ -494,23 +508,16 @@
         }
 
         async function fishCatch(coinsEarned, token) {
-            const data = await apiFetch('/user/fish-catch', {
-                method: 'POST',
-                body: JSON.stringify({ coinsEarned, fishingToken: token })
-            });
-            playerData.coins = data.coins;
-            fishingToken = null;
-            return data;
+            const data = await apiFetch('/user/fish-catch', { method: 'POST', body: JSON.stringify({ coinsEarned, fishingToken: token }) });
+            playerData.coins = data.coins; fishingToken = null; return data;
         }
 
         async function deposit(txid, coins, usd) {
-            const data = await apiFetch('/user/deposit', { method: 'POST', body: JSON.stringify({ txid, coins, usd }) });
-            return data;
+            return await apiFetch('/user/deposit', { method: 'POST', body: JSON.stringify({ txid, coins, usd }) });
         }
 
         async function withdraw(amountCoins, wallet) {
-            const data = await apiFetch('/user/withdraw', { method: 'POST', body: JSON.stringify({ amountCoins, wallet }) });
-            return data;
+            return await apiFetch('/user/withdraw', { method: 'POST', body: JSON.stringify({ amountCoins, wallet }) });
         }
 
         // ========== DADOS DO JOGO ==========
@@ -539,13 +546,22 @@
 
         function getEquippedRod() { return playerData.equippedRod ? RODS.find(r => r.id === playerData.equippedRod) : null; }
 
+        function showEventModal() {
+            if (!eventModalShown && isLoggedIn) {
+                document.getElementById('event-modal').classList.add('show');
+                eventModalShown = true;
+            }
+        }
+
+        function closeEventModal() { document.getElementById('event-modal').classList.remove('show'); }
+
         function enableGame(username) {
             isLoggedIn = true; currentUsername = username;
             document.getElementById('auth-overlay').classList.remove('show');
             document.getElementById('cast-button').disabled = false;
             document.getElementById('cast-button').textContent = '🎣 Jogar Anzol';
             document.getElementById('logout-btn').style.display = 'flex';
-            loadPlayerData().then(() => updateUI());
+            loadPlayerData().then(() => { updateUI(); setTimeout(() => showEventModal(), 500); });
             if (soundManager.soundEnabled && soundManager.audioCtx) soundManager.bgMusic.play().catch(() => {});
             if (window.energyInterval) clearInterval(window.energyInterval);
             window.energyInterval = setInterval(updateEnergyTimer, 60000);
@@ -602,14 +618,9 @@
         async function unequipRod() {
             try {
                 await apiFetch('/user/unequip-rod', { method: 'POST' });
-                playerData.equippedRod = null;
-                playerData.maxEnergy = 0;
-                playerData.currentEnergy = 0;
-                updateUI();
-                showMessage('Vara desequipada!', 2000);
-            } catch (e) {
-                showMessage('Erro ao desequipar', 2000);
-            }
+                playerData.equippedRod = null; playerData.maxEnergy = 0; playerData.currentEnergy = 0;
+                updateUI(); showMessage('Vara desequipada!', 2000);
+            } catch (e) { showMessage('Erro ao desequipar', 2000); }
         }
 
         function updateEnergyTimer() {
@@ -621,8 +632,7 @@
 
         function showMessage(text, dur = 2500) {
             const m = document.getElementById('message');
-            clearTimeout(m._t);
-            m.textContent = text; m.style.display = 'block';
+            clearTimeout(m._t); m.textContent = text; m.style.display = 'block';
             m._t = setTimeout(() => { m.style.display = 'none'; }, dur);
         }
 
@@ -634,7 +644,6 @@
         let fishingCooldown = false;
         let isCasting = false;
         let isStopping = false;
-
         let projectileOrigin = new THREE.Vector3(), projectileTarget = new THREE.Vector3(), projectileProgress = 0, projectileDuration = 1.2, projectileElapsed = 0;
         let bobberLanded = false, bobberWorldPos = new THREE.Vector3();
         let currentCatchPokemon = null;
@@ -672,54 +681,28 @@
             const rod = getEquippedRod();
             if (!rod) { showMessage('🎣 Você precisa de uma vara! Compre na loja.', 2500); return; }
             if (playerData.currentEnergy <= 0) { showMessage('⚡ Sem energia!', 2500); return; }
-
-            isCasting = true;
-            castButton.disabled = true;
-            castButton.textContent = '⏳ Verificando...';
-
+            isCasting = true; castButton.disabled = true; castButton.textContent = '⏳ Verificando...';
             try {
                 const data = await apiFetch('/user/spend-energy', { method: 'POST' });
-                playerData.currentEnergy = data.currentEnergy;
-                fishingToken = data.fishingToken;
-                updateUI();
-
+                playerData.currentEnergy = data.currentEnergy; fishingToken = data.fishingToken; updateUI();
                 if (gameState !== GameState.IDLE) return;
-
-                gameState = GameState.POWER_METER;
-                powerMeterValue = 0;
-                powerMeterDirection = 1;
-                powerMeterContainer.style.display = 'block';
-                castButton.textContent = '🎯 PARAR!';
-                castButton.disabled = false;
-                castButton.style.background = '#ff8844';
-                powerMeterFill.style.width = '0%';
+                gameState = GameState.POWER_METER; powerMeterValue = 0; powerMeterDirection = 1;
+                powerMeterContainer.style.display = 'block'; castButton.textContent = '🎯 PARAR!';
+                castButton.disabled = false; castButton.style.background = '#ff8844'; powerMeterFill.style.width = '0%';
                 document.getElementById('pokemon-overlay').classList.remove('show');
             } catch (e) {
                 showMessage('⚡ ' + (e.message || 'Erro ao gastar energia'), 2000);
-                gameState = GameState.IDLE;
-                castButton.textContent = '🎣 Jogar Anzol';
-                castButton.disabled = false;
-                castButton.style.background = '#FFD966';
-            } finally {
-                isCasting = false;
-            }
+                gameState = GameState.IDLE; castButton.textContent = '🎣 Jogar Anzol';
+                castButton.disabled = false; castButton.style.background = '#FFD966';
+            } finally { isCasting = false; }
         }
 
         function stopPowerMeter() {
             if (isStopping || gameState !== GameState.POWER_METER) return;
-
-            isStopping = true;
-            castButton.disabled = true;
-
-            castPower = powerMeterValue;
-            gameState = GameState.CASTING;
-            powerMeterContainer.style.display = 'none';
-            castButton.textContent = '🎣 Lançando...';
-            castButton.style.background = '#888';
-            soundManager.playSfx('cast');
-            startCastAnimation(castPower);
-
-            isStopping = false;
+            isStopping = true; castButton.disabled = true;
+            castPower = powerMeterValue; gameState = GameState.CASTING; powerMeterContainer.style.display = 'none';
+            castButton.textContent = '🎣 Lançando...'; castButton.style.background = '#888';
+            soundManager.playSfx('cast'); startCastAnimation(castPower); isStopping = false;
         }
 
         function buildCatchMeterSegments() {
@@ -727,12 +710,7 @@
             if (!cont) return;
             cont.innerHTML = '';
             [{ color: 'red', count: 28 }, { color: 'yellow', count: 12 }, { color: 'green', count: 4 }].forEach(g => {
-                for (let i = 0; i < g.count; i++) {
-                    const s = document.createElement('div');
-                    s.className = `catch-segment ${g.color}`;
-                    s.style.flex = 1;
-                    cont.appendChild(s);
-                }
+                for (let i = 0; i < g.count; i++) { const s = document.createElement('div'); s.className = `catch-segment ${g.color}`; s.style.flex = 1; cont.appendChild(s); }
             });
         }
         buildCatchMeterSegments();
@@ -744,76 +722,49 @@
 
         function startCatchMeter() {
             if (gameState !== GameState.BOBBER_WAIT) return;
-            gameState = GameState.CATCH_METER;
-            catchMeterValue = 0.5;
-            catchMeterDirection = Math.random() > 0.5 ? 1 : -1;
+            gameState = GameState.CATCH_METER; catchMeterValue = 0.5; catchMeterDirection = Math.random() > 0.5 ? 1 : -1;
             const rod = getEquippedRod();
             const allowedPool = pokemonPool.filter(p => p.stars <= rod.maxStars);
             if (allowedPool.length === 0) { showMessage('Erro no pool!', 2000); startCooldown(); return; }
             currentCatchPokemon = allowedPool[Math.floor(Math.random() * allowedPool.length)];
             const speedMap = { 1: 0.025, 2: 0.035, 3: 0.05, 4: 0.065, 5: 0.08 };
             catchMeterSpeed = speedMap[currentCatchPokemon.stars] || 0.04;
-            catchMeterContainer.style.display = 'flex';
-            catchMeterLabel.textContent = '🎯 PRECISÃO';
-            castButton.textContent = '🎣 FISGAR!';
-            castButton.disabled = false;
-            castButton.style.background = '#44cc44';
-            catchMeterIndicator.style.left = '50%';
+            catchMeterContainer.style.display = 'flex'; catchMeterLabel.textContent = '🎯 PRECISÃO';
+            castButton.textContent = '🎣 FISGAR!'; castButton.disabled = false; castButton.style.background = '#44cc44'; catchMeterIndicator.style.left = '50%';
         }
 
         function stopCatchMeter() {
             if (gameState !== GameState.CATCH_METER) return;
-            const finalVal = catchMeterValue;
-            gameState = GameState.RESULT;
-            catchMeterContainer.style.display = 'none';
-            castButton.textContent = '⏳ Processando...';
-            castButton.disabled = true;
-            castButton.style.background = '#888';
+            const finalVal = catchMeterValue; gameState = GameState.RESULT; catchMeterContainer.style.display = 'none';
+            castButton.textContent = '⏳ Processando...'; castButton.disabled = true; castButton.style.background = '#888';
             const zone = getCatchZoneFromValue(finalVal), baseChance = getCatchChance(zone), success = Math.random() < baseChance;
-            const chosen = currentCatchPokemon || pokemonPool[0];
-            currentCatchPokemon = null;
+            const chosen = currentCatchPokemon || pokemonPool[0]; currentCatchPokemon = null;
             setTimeout(() => {
                 if (success) {
                     showMessage(`✅ ${chosen.name} capturado! (+${chosen.coins} moedas)`, 3000);
-                    showPokemonOverlay(chosen, true);
-                    fishCatch(chosen.coins, fishingToken).then(() => updateUI());
-                } else {
-                    showMessage(`❌ ${chosen.name} escapou...`, 2500);
-                    showPokemonOverlay(chosen, false);
-                }
+                    showPokemonOverlay(chosen, true); fishCatch(chosen.coins, fishingToken).then(() => updateUI());
+                } else { showMessage(`❌ ${chosen.name} escapou...`, 2500); showPokemonOverlay(chosen, false); }
                 startCooldown();
             }, 600);
         }
 
         function startCooldown() {
-            gameState = GameState.COOLDOWN;
-            fishingCooldown = true;
-            castButton.textContent = '⏳ Aguarde...';
-            castButton.disabled = true;
-            castButton.style.background = '#666';
+            gameState = GameState.COOLDOWN; fishingCooldown = true; castButton.textContent = '⏳ Aguarde...';
+            castButton.disabled = true; castButton.style.background = '#666';
             if (originalBobber) originalBobber.visible = true;
             if (fishingLine) fishingLine.visible = true;
-            projectileGroup.visible = false;
-            bobberLanded = false;
-            updateUI();
+            projectileGroup.visible = false; bobberLanded = false; updateUI();
             setTimeout(() => {
-                gameState = GameState.IDLE;
-                fishingCooldown = false;
+                gameState = GameState.IDLE; fishingCooldown = false;
                 castButton.textContent = isLoggedIn ? '🎣 Jogar Anzol' : '🔐 Faça login';
-                castButton.disabled = !isLoggedIn || !getEquippedRod();
-                castButton.style.background = '#FFD966';
-                updateUI();
+                castButton.disabled = !isLoggedIn || !getEquippedRod(); castButton.style.background = '#FFD966'; updateUI();
             }, 2200);
         }
 
         castButton.addEventListener('click', () => {
             if (!gameStarted || !isLoggedIn) return;
             if (fishingCooldown || isCasting || isStopping) return;
-            switch (gameState) {
-                case GameState.IDLE: startPowerMeter(); break;
-                case GameState.POWER_METER: stopPowerMeter(); break;
-                case GameState.CATCH_METER: stopCatchMeter(); break;
-            }
+            switch (gameState) { case GameState.IDLE: startPowerMeter(); break; case GameState.POWER_METER: stopPowerMeter(); break; case GameState.CATCH_METER: stopCatchMeter(); break; }
         });
 
         // ========== CENA 3D COMPLETA ==========
@@ -824,20 +775,16 @@
         scene.background = new THREE.Color(0x87CEEB);
         scene.fog = new THREE.FogExp2(0x87CEEB, 0.00015);
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.5, 280);
-        camera.position.set(24, 22, 34);
-        camera.lookAt(0, 0.5, 0);
+        camera.position.set(24, 22, 34); camera.lookAt(0, 0.5, 0);
         const renderer = new THREE.WebGLRenderer({ antialias: true, canvas: document.getElementById('gameCanvas') });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.outputEncoding = THREE.sRGBEncoding;
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true; controls.dampingFactor = 0.08; controls.rotateSpeed = 0.5; controls.panSpeed = 0.8;
         controls.enableZoom = true; controls.zoomSpeed = 0.5; controls.minDistance = 16; controls.maxDistance = 50;
-        controls.target.set(0, 1.0, 0); controls.minPolarAngle = 0.2; controls.maxPolarAngle = Math.PI / 2 - 0.05;
-        controls.update();
+        controls.target.set(0, 1.0, 0); controls.minPolarAngle = 0.2; controls.maxPolarAngle = Math.PI / 2 - 0.05; controls.update();
 
         const ambientLight = new THREE.AmbientLight(0x4a5a6a); scene.add(ambientLight);
         const sunLight = new THREE.DirectionalLight(0xFFF8EC, 1.2); sunLight.position.set(30, 28, 18);
@@ -845,8 +792,7 @@
         sunLight.shadow.camera.near = 0.5; sunLight.shadow.camera.far = 100;
         sunLight.shadow.camera.left = -28; sunLight.shadow.camera.right = 28;
         sunLight.shadow.camera.top = 28; sunLight.shadow.camera.bottom = -28;
-        sunLight.shadow.bias = -0.0004; sunLight.shadow.normalBias = 0.02;
-        scene.add(sunLight);
+        sunLight.shadow.bias = -0.0004; sunLight.shadow.normalBias = 0.02; scene.add(sunLight);
         const backLight = new THREE.DirectionalLight(0xB0C4DE, 0.45); backLight.position.set(-10, 12, -18); scene.add(backLight);
         const hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x4a6b3a, 0.4); scene.add(hemisphereLight);
 
