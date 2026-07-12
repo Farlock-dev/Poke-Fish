@@ -522,26 +522,40 @@
 
         // ========== DADOS DO JOGO ==========
         const RODS = [
-            { id: 'old_rod', name: 'Old Rod', rarity: 'comum', maxStars: 1, energy: 10, priceUSD: 20, priceCoins: 2000, roiDays: 90, color: '#aaa', desc: 'Ideal para iniciantes.' },
-            { id: 'good_rod', name: 'Good Rod', rarity: 'rara', maxStars: 2, energy: 30, priceUSD: 50, priceCoins: 5000, roiDays: 60, color: '#44aaff', desc: 'Melhor alcance e raros.' },
-            { id: 'super_rod', name: 'Super Rod', rarity: 'épica', maxStars: 3, energy: 60, priceUSD: 200, priceCoins: 20000, roiDays: 30, color: '#cc44ff', desc: 'Acesso a épicos.' },
-            { id: 'ultra_rod', name: 'Ultra Rod', rarity: 'mítica', maxStars: 4, energy: 120, priceUSD: 500, priceCoins: 50000, roiDays: 15, color: '#ff8800', desc: 'Acesso a míticos.' },
-            { id: 'legend_rod', name: 'Legend Rod', rarity: 'lendária', maxStars: 5, energy: 250, priceUSD: 1000, priceCoins: 100000, roiDays: 7, color: '#ffdd00', desc: 'Acesso a Lendários.' },
+            { id: 'old_rod', name: 'Old Rod', rarity: 'comum', maxStars: 1, energy: 10, priceUSD: 20, priceCoins: 2000, roiDays: 100, color: '#aaa', desc: 'Ideal para iniciantes.' },
+            { id: 'good_rod', name: 'Good Rod', rarity: 'rara', maxStars: 2, energy: 30, priceUSD: 50, priceCoins: 5000, roiDays: 54, color: '#44aaff', desc: 'Melhor alcance e raros.' },
+            { id: 'super_rod', name: 'Super Rod', rarity: 'épica', maxStars: 3, energy: 60, priceUSD: 200, priceCoins: 20000, roiDays: 64, color: '#cc44ff', desc: 'Acesso a épicos.' },
+            { id: 'ultra_rod', name: 'Ultra Rod', rarity: 'mítica', maxStars: 4, energy: 120, priceUSD: 500, priceCoins: 50000, roiDays: 45, color: '#ff8800', desc: 'Acesso a míticos.' },
+            { id: 'legend_rod', name: 'Legend Rod', rarity: 'lendária', maxStars: 5, energy: 250, priceUSD: 1000, priceCoins: 100000, roiDays: 37, color: '#ffdd00', desc: 'Acesso a Lendários.' },
         ];
+        
+        // Pokémon com pesos para probabilidade
         const pokemonPool = [
-            { id: 129, name: 'Magikarp', stars: 1, coins: 1 }, { id: 118, name: 'Goldeen', stars: 1, coins: 2 },
-            { id: 72, name: 'Tentacool', stars: 1, coins: 2 }, { id: 116, name: 'Horsea', stars: 1, coins: 3 },
-            { id: 278, name: 'Wingull', stars: 1, coins: 2 }, { id: 120, name: 'Staryu', stars: 2, coins: 4 },
-            { id: 90, name: 'Shellder', stars: 2, coins: 3 }, { id: 98, name: 'Krabby', stars: 2, coins: 3 },
-            { id: 170, name: 'Chinchou', stars: 2, coins: 5 }, { id: 223, name: 'Remoraid', stars: 2, coins: 4 },
-            { id: 8, name: 'Wartortle', stars: 3, coins: 10 }, { id: 159, name: 'Croconaw', stars: 3, coins: 12 },
-            { id: 259, name: 'Marshtomp', stars: 3, coins: 11 }, { id: 394, name: 'Prinplup', stars: 3, coins: 10 },
-            { id: 502, name: 'Dewott', stars: 3, coins: 13 }, { id: 131, name: 'Lapras', stars: 4, coins: 25 },
-            { id: 134, name: 'Vaporeon', stars: 4, coins: 30 }, { id: 130, name: 'Gyarados', stars: 4, coins: 28 },
-            { id: 350, name: 'Milotic', stars: 4, coins: 27 }, { id: 230, name: 'Kingdra', stars: 4, coins: 29 },
-            { id: 382, name: 'Kyogre', stars: 5, coins: 60 }, { id: 245, name: 'Suicune', stars: 5, coins: 55 },
-            { id: 147, name: 'Dratini', stars: 5, coins: 50 }, { id: 721, name: 'Volcanion', stars: 5, coins: 58 },
-            { id: 788, name: 'Tapu Fini', stars: 5, coins: 57 },
+            { id: 129, name: 'Magikarp', stars: 1, coins: 1, weight: 90 },
+            { id: 118, name: 'Goldeen', stars: 1, coins: 2, weight: 90 },
+            { id: 72, name: 'Tentacool', stars: 1, coins: 2, weight: 90 },
+            { id: 116, name: 'Horsea', stars: 1, coins: 3, weight: 90 },
+            { id: 278, name: 'Wingull', stars: 1, coins: 2, weight: 90 },
+            { id: 120, name: 'Staryu', stars: 2, coins: 4, weight: 44 },
+            { id: 90, name: 'Shellder', stars: 2, coins: 3, weight: 44 },
+            { id: 98, name: 'Krabby', stars: 2, coins: 3, weight: 44 },
+            { id: 170, name: 'Chinchou', stars: 2, coins: 5, weight: 44 },
+            { id: 223, name: 'Remoraid', stars: 2, coins: 4, weight: 44 },
+            { id: 8, name: 'Wartortle', stars: 3, coins: 10, weight: 20 },
+            { id: 159, name: 'Croconaw', stars: 3, coins: 12, weight: 20 },
+            { id: 259, name: 'Marshtomp', stars: 3, coins: 11, weight: 20 },
+            { id: 394, name: 'Prinplup', stars: 3, coins: 10, weight: 20 },
+            { id: 502, name: 'Dewott', stars: 3, coins: 13, weight: 20 },
+            { id: 131, name: 'Lapras', stars: 4, coins: 25, weight: 6 },
+            { id: 134, name: 'Vaporeon', stars: 4, coins: 30, weight: 6 },
+            { id: 130, name: 'Gyarados', stars: 4, coins: 28, weight: 6 },
+            { id: 350, name: 'Milotic', stars: 4, coins: 27, weight: 6 },
+            { id: 230, name: 'Kingdra', stars: 4, coins: 29, weight: 6 },
+            { id: 382, name: 'Kyogre', stars: 5, coins: 60, weight: 3 },
+            { id: 245, name: 'Suicune', stars: 5, coins: 55, weight: 3 },
+            { id: 147, name: 'Dratini', stars: 5, coins: 50, weight: 3 },
+            { id: 721, name: 'Volcanion', stars: 5, coins: 58, weight: 3 },
+            { id: 788, name: 'Tapu Fini', stars: 5, coins: 57, weight: 3 },
         ];
 
         function getEquippedRod() { return playerData.equippedRod ? RODS.find(r => r.id === playerData.equippedRod) : null; }
@@ -636,7 +650,7 @@
             m._t = setTimeout(() => { m.style.display = 'none'; }, dur);
         }
 
-        // ========== SISTEMA DE PESCA ==========
+        // ========== SISTEMA DE PESCA (HARDCORE) ==========
         const GameState = { IDLE: 'idle', POWER_METER: 'power_meter', CASTING: 'casting', BOBBER_WAIT: 'bobber_wait', CATCH_METER: 'catch_meter', RESULT: 'result', COOLDOWN: 'cooldown' };
         let gameState = GameState.IDLE, powerMeterValue = 0, powerMeterDirection = 1, castPower = 0.5;
         const POWER_METER_SPEED = 0.03;
@@ -654,6 +668,12 @@
         const catchMeterContainer = document.getElementById('catch-meter-container');
         const catchMeterIndicator = document.getElementById('catch-meter-indicator');
         const catchMeterLabel = document.getElementById('catch-meter-label');
+
+        // Chances ajustadas (20%/55%/85%)
+        const catchChances = { red: 0.20, yellow: 0.55, green: 0.85 };
+        
+        // Velocidade hardcore
+        const speedMap = { 1: 0.045, 2: 0.065, 3: 0.090, 4: 0.115, 5: 0.140 };
 
         function showPokemonOverlay(pokemon, success) {
             const overlay = document.getElementById('pokemon-overlay');
@@ -716,7 +736,7 @@
         buildCatchMeterSegments();
         const ZONE_RED_END = 28 / 44, ZONE_YELLOW_END = (28 + 12) / 44;
         function getCatchZoneFromValue(v) { if (v < ZONE_RED_END) return 'red'; if (v < ZONE_YELLOW_END) return 'yellow'; return 'green'; }
-        function getCatchChance(z) { return z === 'green' ? 0.85 : z === 'yellow' ? 0.6 : 0.3; }
+        function getCatchChance(z) { return catchChances[z]; }
         function getCatchLabelColor(z) { return z === 'green' ? '#2ecc71' : z === 'yellow' ? '#f1c40f' : '#e74c3c'; }
         function getPowerColor() { if (powerMeterValue < 0.4) return '#44cc44'; if (powerMeterValue < 0.8) return '#cccc44'; return '#cc4444'; }
 
@@ -726,8 +746,19 @@
             const rod = getEquippedRod();
             const allowedPool = pokemonPool.filter(p => p.stars <= rod.maxStars);
             if (allowedPool.length === 0) { showMessage('Erro no pool!', 2000); startCooldown(); return; }
-            currentCatchPokemon = allowedPool[Math.floor(Math.random() * allowedPool.length)];
-            const speedMap = { 1: 0.025, 2: 0.035, 3: 0.05, 4: 0.065, 5: 0.08 };
+            
+            // Seleção ponderada por peso
+            const totalWeight = allowedPool.reduce((sum, p) => sum + p.weight, 0);
+            let random = Math.random() * totalWeight;
+            for (const p of allowedPool) {
+                random -= p.weight;
+                if (random <= 0) {
+                    currentCatchPokemon = p;
+                    break;
+                }
+            }
+            if (!currentCatchPokemon) currentCatchPokemon = allowedPool[0];
+            
             catchMeterSpeed = speedMap[currentCatchPokemon.stars] || 0.04;
             catchMeterContainer.style.display = 'flex'; catchMeterLabel.textContent = '🎯 PRECISÃO';
             castButton.textContent = '🎣 FISGAR!'; castButton.disabled = false; castButton.style.background = '#44cc44'; catchMeterIndicator.style.left = '50%';
@@ -1308,7 +1339,6 @@
             const t = ts * 0.001;
             waterMaterial.uniforms.time.value = t;
             lavaFlowMat.uniforms.time.value = t;
-            // Flutuação do Shiny Greninja
             greninjaSprite.position.y = 0.4 + Math.sin(t * 2) * 0.06;
             if (gameState === GameState.POWER_METER) {
                 powerMeterValue += POWER_METER_SPEED * powerMeterDirection;
@@ -1542,7 +1572,7 @@
         });
         document.getElementById('copy-wallet-btn').addEventListener('click', () => { navigator.clipboard.writeText('0x439480d29c0633d3e50c78071d235a8eb766034c').then(() => alert('Carteira copiada!')).catch(() => alert('Erro ao copiar')); });
 
-        console.log('🎣 Poke Fish NFT - Completo e funcional!');
+        console.log('🎣 Poke Fish NFT - Hardcore Edition!');
     </script>
 </body>
-</html>
+    </html>
