@@ -223,7 +223,7 @@
         </div>
     </div>
 
-    <!-- Modal de Boas-Vindas / Training Rod (CORRIGIDO – restaurando tamanho original, melhorando a última frase) -->
+    <!-- Modal de Boas-Vindas / Training Rod -->
     <div id="welcome-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:none;justify-content:center;align-items:center;z-index:200;pointer-events:auto;backdrop-filter:blur(5px);">
         <div style="background:linear-gradient(145deg,#1a3a4a 0%,#0d1f2d 100%);border:4px solid #FFD966;border-radius:24px;padding:40px 30px;max-width:550px;width:90vw;text-align:center;box-shadow:0 0 60px rgba(255,215,100,0.4);font-family:'Press Start 2P',cursive;color:#fff;">
             <h2 style="color:#FFD966;font-size:16px;margin-bottom:25px;line-height:1.6;">Bem-vindo ao Poke Fish,<br>você recebeu a Training Rod.</h2>
@@ -320,7 +320,7 @@
                     <button id="copy-wallet-btn">📋 Copiar Carteira</button>
                     <p class="crypto-notice" style="margin-top:10px; color:#ccc; font-size:9px; line-height:1.7;">🌐 Rede: <strong style="color:#FFD966;">BSC (BEP-20)</strong></p>
                 </div>
-                <input type="text" id="txid-input" placeholder="TXID (64 caracteres mín.)" minlength="64">
+                <input type="text" id="txid-input" placeholder="BSC: 0x... (66 caracteres) | Off‑chain: mín. 10 caracteres">
                 <button id="confirm-crypto-btn">CONFIRMAR PAGAMENTO</button>
                 <div id="crypto-msg" style="font-size:9px; color:#ff6b6b; min-height:16px;"></div>
                 <button id="close-crypto">❌ Cancelar</button>
@@ -690,7 +690,6 @@
                 const equipped = playerData.equippedRod === rod.id;
                 const div = document.createElement('div');
                 div.className = `shop-item ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}`;
-                // Nome da vara com a cor específica, igual ao HUD
                 div.innerHTML = `
                     <div style="font-size:28px;">🎣</div>
                     <div style="color:${rod.color}; font-size:11px; margin:6px 0;">${rod.name.toUpperCase()}</div>
@@ -971,7 +970,7 @@
         const mountainObstacles = [ { pos: new THREE.Vector3(-8, 0, -5), radius: 3.0 }, { pos: new THREE.Vector3(-12, 0, -3), radius: 1.8 }, { pos: new THREE.Vector3(14, 0, -4), radius: 2.0 }, { pos: new THREE.Vector3(9, 0, -6), radius: 5.0 } ];
         function isInsideMountain(x, z) { return mountainObstacles.some(o => Math.sqrt((x-o.pos.x)**2 + (z-o.pos.z)**2) < o.radius); }
 
-        // ========== TEXTURAS E CENÁRIO (COMPLETO) ==========
+        // ========== TEXTURAS E CENÁRIO (COMPLETO, SEM ALTERAÇÕES) ==========
         function createMountainTexture() {
             const c = document.createElement('canvas'); c.width = 512; c.height = 1024; const ctx = c.getContext('2d');
             const grad = ctx.createLinearGradient(0, 0, 0, 1024);
@@ -1622,7 +1621,15 @@
         document.getElementById('confirm-crypto-btn').addEventListener('click', async () => {
             if (!selectedPackage) { document.getElementById('crypto-msg').textContent = 'Nenhum pacote selecionado.'; return; }
             const txid = document.getElementById('txid-input').value.trim();
-            if (txid.length < 64) { document.getElementById('crypto-msg').textContent = 'TXID inválido (mín. 64 caracteres).'; return; }
+            const isValidDepositId = (id) => {
+                if (/^0x[a-fA-F0-9]{64}$/.test(id)) return true;   // BSC
+                if (/^[a-zA-Z0-9]{10,}$/.test(id)) return true;   // Off‑chain
+                return false;
+            };
+            if (!isValidDepositId(txid)) {
+                document.getElementById('crypto-msg').textContent = 'TXID inválido. BSC: 0x... (66 caracteres) ou off‑chain: mín. 10 caracteres.';
+                return;
+            }
             const btn = document.getElementById('confirm-crypto-btn'); btn.disabled = true; btn.textContent = 'Enviando...';
             try {
                 await deposit(txid, selectedPackage.coins, selectedPackage.usd);
