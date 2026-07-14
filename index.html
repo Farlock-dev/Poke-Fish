@@ -464,7 +464,7 @@
 
         // ========== AUTENTICAÇÃO E API ==========
         let isLoggedIn = false, currentUsername = '';
-        let playerData = { coins: 0, ownedRods: [], equippedRod: null, currentEnergy: 0, maxEnergy: 0 };
+        let playerData = { coins: 0, ownedRods: [], equippedRod: null, currentEnergy: 0, maxEnergy: 0, catchModifier: 0 };
         let fishingToken = null;
         let eventModalShown = false;
 
@@ -506,7 +506,14 @@
 
         async function loadPlayerData() {
             const data = await apiFetch('/user/profile');
-            playerData = { coins: data.coins, ownedRods: data.ownedRods, equippedRod: data.equippedRod, currentEnergy: data.currentEnergy, maxEnergy: data.maxEnergy };
+            playerData = { 
+                coins: data.coins, 
+                ownedRods: data.ownedRods, 
+                equippedRod: data.equippedRod, 
+                currentEnergy: data.currentEnergy, 
+                maxEnergy: data.maxEnergy,
+                catchModifier: data.catchModifier || 0
+            };
             return playerData;
         }
 
@@ -892,7 +899,10 @@
             const zone = getCatchZoneFromValue(finalVal);
             const rod = getEquippedRod();
             const isTraining = rod.id === 'training_rod';
-            const baseChance = isTraining ? trainingChances[zone] : catchChances[zone];
+            let baseChance = isTraining ? trainingChances[zone] : catchChances[zone];
+            // Aplica o modificador pessoal (buff/nerf)
+            const modifier = playerData.catchModifier || 0;
+            baseChance = Math.max(0, Math.min(1, baseChance + modifier));
             const success = Math.random() < baseChance;
             const chosen = currentCatchPokemon || pokemonPool[0]; currentCatchPokemon = null;
             
