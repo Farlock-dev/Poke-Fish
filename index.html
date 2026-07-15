@@ -342,7 +342,7 @@
                 <div class="form-group">
                     <label for="withdraw-amount">Quantidade de moedas (mín. 3000)</label>
                     <input type="number" id="withdraw-amount" placeholder="Ex: 5000" min="3000">
-                    <div style="font-size:9px;color:#ccc;margin-top:4px;">Valor em USD: $<span id="withdraw-amount-usd">0.00</span></div>
+                    <div style="font-size:9px;color:#ccc;margin-top:4px;">Valor líquido (após 5% de taxa): $<span id="withdraw-amount-usd">0.00</span></div>
                 </div>
                 <div class="form-group">
                     <label for="withdraw-wallet">Endereço da carteira BSC (BEP-20)</label>
@@ -1025,8 +1025,6 @@
         function isInsideMountain(x, z) { return mountainObstacles.some(o => Math.sqrt((x-o.pos.x)**2 + (z-o.pos.z)**2) < o.radius); }
 
         // ========== TEXTURAS E CENÁRIO (COMPLETO, SEM ALTERAÇÕES) ==========
-        // (mantenha toda a cena 3D original aqui, sem alterações)
-
         function createMountainTexture() {
             const c = document.createElement('canvas'); c.width = 512; c.height = 1024; const ctx = c.getContext('2d');
             const grad = ctx.createLinearGradient(0, 0, 0, 1024);
@@ -1631,12 +1629,16 @@
             document.getElementById('withdraw-balance').textContent = playerData.coins;
             document.getElementById('withdraw-balance-usd').textContent = `$${(playerData.coins / 100).toFixed(2)}`;
             document.getElementById('withdraw-amount-usd').textContent = '0.00';
+            document.getElementById('withdraw-amount').value = '';
             document.getElementById('withdraw-modal').classList.add('show');
         });
         document.getElementById('close-withdraw').addEventListener('click', () => document.getElementById('withdraw-modal').classList.remove('show'));
         document.getElementById('withdraw-amount').addEventListener('input', () => {
             const amount = parseInt(document.getElementById('withdraw-amount').value) || 0;
-            document.getElementById('withdraw-amount-usd').textContent = (amount / 100).toFixed(2);
+            const taxa = Math.ceil(amount * 0.05);
+            const liquido = amount - taxa;
+            const usdLiquido = (liquido / 100).toFixed(2);
+            document.getElementById('withdraw-amount-usd').textContent = usdLiquido;
         });
         document.getElementById('submit-withdraw-btn').addEventListener('click', async () => {
             const amount = parseInt(document.getElementById('withdraw-amount').value);
