@@ -138,10 +138,18 @@
         #pokemon-name-display { color: #FFD966; font-size: 18px; margin-top: 10px; text-shadow: 3px 3px 0 #3A2E1C; font-family: 'Press Start 2P', cursive; letter-spacing: 1px; }
         #pokemon-stars { font-size: 28px; margin-top: 4px; letter-spacing: 4px; }
 
-        #referral-stats-list { list-style: none; padding: 0; margin-top: 15px; }
-        #referral-stats-list li { background: rgba(255,215,100,0.05); border: 1px solid var(--gold); border-radius: 8px; padding: 8px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #eee; }
-        #referral-stats-list li span:first-child { color: #FFD966; }
-        #referral-stats-list li span:last-child { color: #4CAF50; }
+        /* Correção para lista de indicados não quebrar a tela */
+        #referral-panel {
+            max-height: 85vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        #referral-stats-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
 
         .progress-box { background: rgba(255,215,100,0.05); border: 1px solid var(--gold); border-radius: 12px; padding: 14px; margin: 15px 0; text-align: left; }
         .progress-box p { font-size: 10px; color: #FFD966; margin-bottom: 10px; }
@@ -231,12 +239,12 @@
                 <hr style="border-color:#5C3E2C; margin:8px 0;">
                 <div class="progress-row">
                     <span>🎣 Super Rod</span>
-                    <span id="ref-super-text" style="color:#FFD966;">0/10</span>
+                    <span id="ref-super-text" style="color:#cc44ff;">0/10</span>
                     <span id="ref-super-badge" class="badge"></span>
                 </div>
                 <div class="progress-row">
                     <span>🎣 Ultra Rod</span>
-                    <span id="ref-ultra-text" style="color:#b44dff;">0/25</span>
+                    <span id="ref-ultra-text" style="color:#ff8800;">0/25</span>
                     <span id="ref-ultra-badge" class="badge"></span>
                 </div>
                 <div class="progress-row">
@@ -1552,7 +1560,7 @@
         });
         document.getElementById('copy-wallet-btn').addEventListener('click', () => { navigator.clipboard.writeText('0x439480d29c0633d3e50c78071d235a8eb766034c').then(() => alert('Carteira copiada!')).catch(() => alert('Erro ao copiar')); });
 
-        console.log('🎣 Poke Fish NFT - Pronto com Programa de Indicação!');
+        console.log('🎣 Poke Fish NFT – Pronto com Programa de Indicação!');
     </script>
 </body>
 </html>
