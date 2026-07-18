@@ -138,7 +138,6 @@
         #pokemon-name-display { color: #FFD966; font-size: 18px; margin-top: 10px; text-shadow: 3px 3px 0 #3A2E1C; font-family: 'Press Start 2P', cursive; letter-spacing: 1px; }
         #pokemon-stars { font-size: 28px; margin-top: 4px; letter-spacing: 4px; }
 
-        /* Correção para lista de indicados não quebrar a tela */
         #referral-panel {
             max-height: 85vh;
             overflow-y: auto;
@@ -240,7 +239,6 @@
         </div>
     </div>
 
-    <!-- Modal de Indicação com Progresso -->
     <div id="referral-overlay">
         <div id="referral-panel">
             <h2>🎁 Indicação</h2>
@@ -250,7 +248,6 @@
             <div id="referral-code-display" style="background:#1a0f08; border:2px solid var(--gold); border-radius:8px; padding:12px; margin:10px 0; color:#FFD966; font-size:14px; word-break:break-all;"></div>
             <button id="copy-referral-btn">📋 Copiar Código</button>
             
-            <!-- Progresso de Indicação -->
             <div class="progress-box">
                 <p>🏆 Progresso de Indicação</p>
                 <div class="progress-row">
@@ -346,7 +343,6 @@
     <script type="module">
         const API_URL = 'https://pokefish-backend.onrender.com/api';
 
-        // ========== SISTEMA DE ÁUDIO ==========
         class SoundManager {
             constructor() {
                 this.audioCtx = null;
@@ -1318,17 +1314,52 @@
         });
         const lavaFlowMesh = new THREE.Mesh(lavaFlowGeo, lavaFlowMat); lavaFlowMesh.position.y = 4.25; lavaFlowMesh.renderOrder = 1; volcanoGroup.add(lavaFlowMesh);
 
+        // ========== CORREÇÃO: Boia restrita ao lago ==========
         function startCastAnimation(power) {
-            const lakeCenter = new THREE.Vector3(0, -0.8, 0); const deckMinX = -2.9, deckMaxX = 2.9, deckMinZ = -9.6, deckMaxZ = -6;
-            let validPosition = false; let tx, tz;
-            while (!validPosition) {
-                const maxDist = 7, minDist = 1.5, dist = minDist + power * (maxDist - minDist);
+            const lakeCenter = new THREE.Vector3(0, -0.8, 0);
+            const lakeRadius = 7.0;       // raio seguro dentro da água
+            const deckMinX = -2.9, deckMaxX = 2.9, deckMinZ = -9.6, deckMaxZ = -6;
+
+            let validPosition = false;
+            let tx, tz;
+            let attempts = 0;
+            const maxAttempts = 200;
+
+            while (!validPosition && attempts < maxAttempts) {
+                const maxDist = 6.5, minDist = 1.2;
+                const dist = minDist + power * (maxDist - minDist);
                 const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.8;
-                tx = lakeCenter.x + Math.cos(angle) * dist; tz = lakeCenter.z + Math.sin(angle) * dist;
-                if (!(tx > deckMinX && tx < deckMaxX && tz > deckMinZ && tz < deckMaxZ) && !isInsideMountain(tx, tz)) validPosition = true;
+                tx = lakeCenter.x + Math.cos(angle) * dist;
+                tz = lakeCenter.z + Math.sin(angle) * dist;
+
+                // 1. Dentro do círculo do lago?
+                const insideLake = Math.sqrt(tx*tx + tz*tz) <= lakeRadius;
+
+                // 2. Fora do deck?
+                const insideDeck = (tx > deckMinX && tx < deckMaxX && tz > deckMinZ && tz < deckMaxZ);
+
+                // 3. Fora das montanhas?
+                const insideObstacle = isInsideMountain(tx, tz);
+
+                if (insideLake && !insideDeck && !insideObstacle) {
+                    validPosition = true;
+                }
+                attempts++;
             }
-            const clamped = Math.sqrt(tx * tx + tz * tz), finalDist = Math.min(clamped, 7.5), finalAngle = Math.atan2(tz, tx);
-            projectileTarget.set(Math.cos(finalAngle) * finalDist, -0.78, Math.sin(finalAngle) * finalDist);
+
+            // Fallback se não encontrar posição válida
+            if (!validPosition) {
+                tx = lakeCenter.x + (Math.random() - 0.5) * 4;
+                tz = lakeCenter.z + (Math.random() - 0.5) * 4;
+                const fallbackDist = Math.sqrt(tx*tx + tz*tz);
+                if (fallbackDist > lakeRadius) {
+                    const fallbackAngle = Math.atan2(tz, tx);
+                    tx = Math.cos(fallbackAngle) * lakeRadius;
+                    tz = Math.sin(fallbackAngle) * lakeRadius;
+                }
+            }
+
+            projectileTarget.set(tx, -0.78, tz);
             const rodWorldPos = new THREE.Vector3(); fishingRodGroup.getWorldPosition(rodWorldPos);
             projectileOrigin.set(rodWorldPos.x + 0.3, rodWorldPos.y + 3.5, rodWorldPos.z - 2.5);
             projectileProgress = 0; projectileElapsed = 0; projectileDuration = 0.8 + power * 0.8; bobberLanded = false;
@@ -1585,7 +1616,7 @@
         });
         document.getElementById('copy-wallet-btn').addEventListener('click', () => { navigator.clipboard.writeText('0x439480d29c0633d3e50c78071d235a8eb766034c').then(() => alert('Carteira copiada!')).catch(() => alert('Erro ao copiar')); });
 
-        console.log('🎣 Poke Fish NFT – Pronto com Programa de Indicação!');
+        console.log('🎣 Poke Fish NFT – Pronto com sistema de pesca corrigido!');
     </script>
 </body>
 </html>
